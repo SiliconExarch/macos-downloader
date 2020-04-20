@@ -127,12 +127,12 @@ Check_Volume_Support()
 
 Check_Internet()
 {
-	echo -e $(date "+%b %m %H:%M:%S") ${text_progress}"> Checking for internet conectivity."${erase_style}
+	echo -e $(date "+%b %m %H:%M:%S") ${text_progress}"> Checking for internet connectivity."${erase_style}
 
 	if [[ $(ping -c 2 www.google.com) == *transmitted* && $(ping -c 2 www.google.com) == *received* ]]; then
-		echo -e $(date "+%b %m %H:%M:%S") ${move_up}${erase_line}${text_success}"+ Internet conectivity check passed."${erase_style}
+		echo -e $(date "+%b %m %H:%M:%S") ${move_up}${erase_line}${text_success}"+ Internet connectivity check passed."${erase_style}
 	else
-		echo -e $(date "+%b %m %H:%M:%S") ${text_error}"- Internet conectivity check failed."${erase_style}
+		echo -e $(date "+%b %m %H:%M:%S") ${text_error}"- Internet connectivity check failed."${erase_style}
 		echo -e $(date "+%b %m %H:%M:%S") ${text_message}"/ Run this tool while connected to the internet."${erase_style}
 
 		Input_On
