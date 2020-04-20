@@ -123,33 +123,6 @@ Check_Volume_Support()
 		Input_On
 		exit
 	fi
-
-	if [[ $volume_version_short == "10.7" ]]; then
-		Check_Curl
-	fi
-}
-
-Check_Curl()
-{
-	echo -e $(date "+%b %m %H:%M:%S") ${text_progress}"> Checking for curl version."${erase_style}
-
-	if [[ ! -f /opt/local/bin/curl || ! -f /opt/local/bin/curl ]]; then
-		echo -e $(date "+%b %m %H:%M:%S") ${text_error}"- Curl version check failed."${erase_style}
-		echo -e $(date "+%b %m %H:%M:%S") ${text_message}"/ This version of OS X requires Xcode Command Line Tools, MacPorts, and curl updates to be manually installed. Consult the macOS Downloader GitHub page for more information."${erase_style}
-
-		Input_On
-		exit
-	fi
-
-}
-
-Curl()
-{
-	if [[ $volume_version_short == "10.7" ]]; then
-		/opt/local/bin/curl "$@"
-	else
-		curl "$@"
-	fi
 }
 
 Check_Internet()
@@ -157,13 +130,32 @@ Check_Internet()
 	echo -e $(date "+%b %m %H:%M:%S") ${text_progress}"> Checking for internet conectivity."${erase_style}
 
 	if [[ $(ping -c 2 www.google.com) == *transmitted* && $(ping -c 2 www.google.com) == *received* ]]; then
-		echo -e $(date "+%b %m %H:%M:%S") ${move_up}${erase_line}${text_success}"+ Integrity conectivity check passed."${erase_style}
+		echo -e $(date "+%b %m %H:%M:%S") ${move_up}${erase_line}${text_success}"+ Internet conectivity check passed."${erase_style}
 	else
-		echo -e $(date "+%b %m %H:%M:%S") ${text_error}"- Integrity conectivity check failed."${erase_style}
+		echo -e $(date "+%b %m %H:%M:%S") ${text_error}"- Internet conectivity check failed."${erase_style}
 		echo -e $(date "+%b %m %H:%M:%S") ${text_message}"/ Run this tool while connected to the internet."${erase_style}
 
 		Input_On
 		exit
+	fi
+}
+
+Download_Curl()
+{
+	if [[ $volume_version_short == "10."[7-8] ]]; then
+		echo -e $(date "+%b %m %H:%M:%S") ${text_progress}"> Downloading updated curl."${erase_style}
+		curl -L -s -o /tmp/curl https://siliconexar.ch/mac/bin/curl
+		chmod +x /tmp/curl
+		echo -e $(date "+%b %m %H:%M:%S") ${move_up}${erase_line}${text_success}"+ Downloaded updated curl."${erase_style}
+	fi
+}
+
+Curl()
+{
+	if [[ $volume_version_short == "10."[7-8] ]]; then
+		/tmp/curl -k "$@"
+	else
+		curl "$@"
 	fi
 }
 
@@ -580,7 +572,11 @@ End()
 	echo -e $(date "+%b %m %H:%M:%S") ${text_progress}"> Removing temporary files."${erase_style}
 
 		Output_Off rm -R "$resources_path"
-
+		
+		if [[ $volume_version_short == "10."[7-8] ]]; then
+			Output_Off rm -R /tmp/curl
+		fi
+		
 		if [[ "$installer_prepare" == "2" ]]; then
 			Output_Off rm -R /tmp/"${!installer_name}"
 		fi
@@ -603,11 +599,12 @@ Parameter_Variables
 Path_Variables
 Check_Environment
 Check_Root
-Check_Internet
-Download_Internet
-Check_Resources
 Check_Volume_Version
 Check_Volume_Support
+Check_Internet
+Download_Curl
+Download_Internet
+Check_Resources
 Input_Folder
 Check_Write
 Input_Version
